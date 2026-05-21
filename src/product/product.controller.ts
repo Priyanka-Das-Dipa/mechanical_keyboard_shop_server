@@ -2,9 +2,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
+  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -48,12 +51,29 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  findAll(@Query() query: any) {
+    return this.productService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+
+    @Body()
+    payload: Partial<CreateProductDto>,
+  ) {
+    return this.productService.update(id, payload);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.productService.remove(id);
   }
 }
