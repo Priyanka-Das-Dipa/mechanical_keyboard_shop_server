@@ -130,4 +130,8 @@ export class ProductService {
       message: 'Product deleted successfully',
     };
   }
+
+  async getBrands() {
+    return this.productModel.distinct('brand');
+  }
 }

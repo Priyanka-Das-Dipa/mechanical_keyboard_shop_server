@@ -55,6 +55,11 @@ export class ProductController {
     return this.productService.findAll(query);
   }
 
+  @Get('brands')
+  getBrands() {
+    return this.productService.getBrands();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
