@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Product } from 'src/product/schemas/product.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -26,6 +27,32 @@ export class User {
 
   @Prop()
   hashedRefreshToken?: string;
+
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: Product.name,
+    },
+  ])
+  wishlist!: mongoose.Types.ObjectId[];
+
+  @Prop([
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Product.name,
+      },
+
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+    },
+  ])
+  cart!: {
+    product: mongoose.Types.ObjectId;
+    quantity: number;
+  }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

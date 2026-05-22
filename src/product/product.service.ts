@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -31,8 +32,12 @@ export class ProductService {
       page = 1,
       limit = 6,
     } = query;
+    const { sortBy = 'createdAt', order = 'desc' } = query;
 
     const filter: any = {};
+    const sort: any = {};
+
+    sort[sortBy] = order === 'asc' ? 1 : -1;
 
     // Search
     if (searchTerm) {
@@ -75,9 +80,9 @@ export class ProductService {
 
     const products = await this.productModel
       .find(filter)
+      .sort(sort)
       .skip(skip)
-      .limit(Number(limit))
-      .sort({ createdAt: -1 });
+      .limit(Number(limit));
 
     const total = await this.productModel.countDocuments(filter);
 
