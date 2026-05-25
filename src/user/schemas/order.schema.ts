@@ -8,6 +8,18 @@ export class Order {
   @Prop({ required: true })
   userId!: string;
 
+  @Prop({ required: true })
+  customerName!: string;
+
+  @Prop({ required: true })
+  customerEmail!: string;
+
+  @Prop({ required: true })
+  customerPhone!: string;
+
+  @Prop({ required: true })
+  deliveryAddress!: string;
+  
   @Prop({ type: Array, required: true })
   products!: {
     productId: string;

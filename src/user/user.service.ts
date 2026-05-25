@@ -13,6 +13,7 @@ import { ProductDocument } from 'src/product/schemas/product.schema';
 import { Order } from './schemas/order.schema';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { CheckoutDto } from './dto/checkout.dto';
 
 @Injectable()
 export class UserService {
@@ -154,7 +155,7 @@ export class UserService {
     };
   }
 
-  async createCheckoutSession(userId: string) {
+  async createCheckoutSession(userId: string, checkoutData: CheckoutDto) {
     const user = await this.userModel.findById(userId).populate<{
       cart: Array<{ product: ProductDocument; quantity: number }>;
     }>('cart.product');
@@ -184,6 +185,13 @@ export class UserService {
 
     const order = await this.orderModel.create({
       userId,
+      customerName: checkoutData.customerName,
+
+      customerEmail: checkoutData.customerEmail,
+
+      customerPhone: checkoutData.customerPhone,
+
+      deliveryAddress: checkoutData.deliveryAddress,
       products: user.cart.map((item) => ({
         productId: item.product._id.toString(),
         quantity: item.quantity,

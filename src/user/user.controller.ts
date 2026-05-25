@@ -14,6 +14,7 @@ import {
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { CheckoutDto } from './dto/checkout.dto';
 
 @Controller('user')
 export class UserController {
@@ -66,8 +67,8 @@ export class UserController {
 
   @Post('checkout')
   @UseGuards(JwtAuthGuard)
-  checkout(@Req() req) {
-    return this.userService.createCheckoutSession(req.user.userId);
+  checkout(@Req() req, @Body() body: CheckoutDto) {
+    return this.userService.createCheckoutSession(req.user.userId, body);
   }
 
   @UseGuards(JwtAuthGuard)
