@@ -63,4 +63,16 @@ export class UserController {
   removeFromCart(@Req() req, @Param('productId') productId: string) {
     return this.userService.removeFromCart(req.user.userId, productId);
   }
+
+  @Post('checkout')
+  @UseGuards(JwtAuthGuard)
+  checkout(@Req() req) {
+    return this.userService.createCheckoutSession(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('payment-success/:sessionId')
+  verifyPayment(@Param('sessionId') sessionId: string, @Req() req) {
+    return this.userService.verifyPayment(sessionId, req.user.userId);
+  }
 }

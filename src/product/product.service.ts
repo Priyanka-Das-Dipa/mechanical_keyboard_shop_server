@@ -27,17 +27,25 @@ export class ProductService {
     const {
       searchTerm,
       brand,
+      rating,
       minPrice,
       maxPrice,
       page = 1,
       limit = 6,
     } = query;
+
     const { sortBy = 'createdAt', order = 'desc' } = query;
 
     const filter: any = {};
     const sort: any = {};
 
     sort[sortBy] = order === 'asc' ? 1 : -1;
+
+    if (rating) {
+      filter.rating = {
+        $gte: Number(rating),
+      };
+    }
 
     // Search
     if (searchTerm) {
