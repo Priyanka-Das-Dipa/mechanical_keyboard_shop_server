@@ -19,7 +19,7 @@ export class Order {
 
   @Prop({ required: true })
   deliveryAddress!: string;
-  
+
   @Prop({ type: Array, required: true })
   products!: {
     productId: string;
@@ -31,7 +31,7 @@ export class Order {
   totalAmount!: number;
 
   @Prop({
-    enum: ['pending', 'paid', 'failed'],
+    enum: ['pending', 'paid', 'shipped', 'delivered', 'failed'],
     default: 'pending',
   })
   paymentStatus!: string;

@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -15,10 +16,28 @@ import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { CheckoutDto } from './dto/checkout.dto';
+import { UserRole } from './schemas/user.schema';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  // GET ALL USERS
+  @UseGuards(JwtAuthGuard)
+  @Get('all-users')
+  getAllUsers() {
+    return this.userService.getAllUsers();
+  }
+
+  // UPDATE USER ROLE
+  @UseGuards(JwtAuthGuard)
+  @Patch('role/:userId')
+  updateUserRole(
+    @Param('userId') userId: string,
+    @Body() body: { role: UserRole },
+  ) {
+    return this.userService.updateUserRole(userId, body.role);
+  }
 
   // ADD WISHLIST
   @UseGuards(JwtAuthGuard)
@@ -75,5 +94,25 @@ export class UserController {
   @Get('payment-success/:sessionId')
   verifyPayment(@Param('sessionId') sessionId: string, @Req() req) {
     return this.userService.verifyPayment(sessionId, req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('orders')
+  getAllOrders() {
+    return this.userService.getAllOrders();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-orders')
+  getMyOrders(@Req() req) {
+    return this.userService.getMyOrders(req.user.userId);
+  }
+
+  @Patch('orders/:orderId/status')
+  updateOrderStatus(
+    @Param('orderId') orderId: string,
+    @Body() body: { status: 'pending' | 'paid' | 'shipped' | 'delivered' },
+  ) {
+    return this.userService.updateOrderStatus(orderId, body.status);
   }
 }

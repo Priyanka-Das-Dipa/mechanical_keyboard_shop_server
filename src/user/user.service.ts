@@ -6,7 +6,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from './schemas/user.schema';
+import { User, UserRole } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductDocument } from 'src/product/schemas/product.schema';
@@ -36,8 +36,31 @@ export class UserService {
     this.stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2026-04-22.dahlia',
     });
+  }
 
-    console.log('Stripe Loaded Successfully');
+  // GET ALL USERS
+  async getAllUsers() {
+    return this.userModel
+      .find()
+      .select('-password -hashedRefreshToken')
+      .sort({ createdAt: -1 });
+  }
+
+  // UPDATE USER ROLE
+  async updateUserRole(userId: string, role: UserRole) {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.role = role;
+
+    await user.save();
+
+    return {
+      message: 'User role updated successfully',
+    };
   }
 
   async create(data: Partial<User>) {
@@ -249,6 +272,33 @@ export class UserService {
 
     return {
       message: 'Payment verified',
+    };
+  }
+
+  async getAllOrders() {
+    return this.orderModel.find().sort({ createdAt: -1 });
+  }
+
+  async getMyOrders(userId: string) {
+    return this.orderModel.find({ userId }).sort({ createdAt: -1 });
+  }
+
+  async updateOrderStatus(
+    orderId: string,
+    status: 'pending' | 'paid' | 'shipped' | 'delivered',
+  ) {
+    const order = await this.orderModel.findById(orderId);
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    order.paymentStatus = status;
+
+    await order.save();
+
+    return {
+      message: 'Order status updated',
     };
   }
 }

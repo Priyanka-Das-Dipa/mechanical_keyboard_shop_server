@@ -4,6 +4,10 @@ import { Product } from 'src/product/schemas/product.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+}
 @Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
@@ -21,9 +25,10 @@ export class User {
 
   @Prop({
     type: String,
-    default: 'user',
+    enum: UserRole,
+    default: UserRole.USER,
   })
-  role!: string;
+  role!: UserRole;
 
   @Prop()
   hashedRefreshToken?: string;
