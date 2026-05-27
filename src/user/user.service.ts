@@ -301,4 +301,79 @@ export class UserService {
       message: 'Order status updated',
     };
   }
+
+  async getDashboardStats() {
+    const totalUsers = await this.userModel.countDocuments();
+
+    const totalOrders = await this.orderModel.countDocuments();
+
+    const paidOrders = await this.orderModel.find({
+      paymentStatus: {
+        $in: ['paid', 'shipped', 'delivered'],
+      },
+    });
+
+    const totalRevenue = paidOrders.reduce(
+      (acc, order) => acc + order.totalAmount,
+      0,
+    );
+
+    // MONTHLY SALES
+    const monthlySales = await this.orderModel.aggregate([
+      {
+        $match: {
+          paymentStatus: {
+            $in: ['paid', 'shipped', 'delivered'],
+          },
+        },
+      },
+
+      {
+        $group: {
+          _id: {
+            month: {
+              $month: '$createdAt',
+            },
+          },
+
+          sales: {
+            $sum: '$totalAmount',
+          },
+        },
+      },
+
+      {
+        $sort: {
+          '_id.month': 1,
+        },
+      },
+    ]);
+
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    const formattedSalesData = monthlySales.map((item) => ({
+      month: monthNames[item._id.month - 1],
+      sales: item.sales,
+    }));
+
+    return {
+      totalUsers,
+      totalOrders,
+      totalRevenue,
+      salesData: formattedSalesData,
+    };
+  }
 }

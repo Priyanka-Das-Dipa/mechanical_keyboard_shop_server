@@ -115,4 +115,10 @@ export class UserController {
   ) {
     return this.userService.updateOrderStatus(orderId, body.status);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('dashboard-stats')
+  getDashboardStats() {
+    return this.userService.getDashboardStats();
+  }
 }
