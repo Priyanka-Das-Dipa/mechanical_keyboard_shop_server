@@ -25,7 +25,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
-      'https://mechanical-keyboard-shop-client-theta.vercel.app',
+      // 'https://mechanical-keyboard-shop-client-theta.vercel.app',
     ],
     credentials: true,
   });

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   BadRequestException,
   Injectable,
@@ -30,7 +31,11 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const tokens = await this.generateTokens(user._id.toString(), user.email);
+    const tokens = await this.generateTokens(
+      user._id.toString(),
+      user.email,
+      user.role,
+    );
 
     const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
 
@@ -47,6 +52,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
+    console.log('LOGIN METHOD HIT');
     const user = await this.usersService.findByEmail(loginDto.email);
 
     if (!user) {
@@ -62,7 +68,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.generateTokens(user._id.toString(), user.email);
+    const tokens = await this.generateTokens(
+      user._id.toString(),
+      user.email,
+      user.role,
+    );
 
     const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
 
@@ -86,11 +96,14 @@ export class AuthService {
     };
   }
 
-  async generateTokens(userId: string, email: string) {
+  async generateTokens(userId: string, email: string, role: string) {
+    console.log('ROLE PARAM:', role);
     const payload = {
       sub: userId,
       email,
+      role,
     };
+    console.log('PAYLOAD:', payload);
 
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
